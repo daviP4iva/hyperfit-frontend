@@ -10,6 +10,8 @@ import UserProfile from './pages/UserProfile';
 import EditProfile from './pages/EditProfile';
 import Training from './pages/Training';
 import './styles/App.css';
+import GeneratedRoutine from './pages/GeneratedRoutine';
+
 
 function App() {
   return (
@@ -25,6 +27,7 @@ function App() {
           <Route path="/user-profile" element={<UserProfile />} />
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/training" element={<Training />} />
+          <Route path="/generated-routine" element={<GeneratedRoutine />} />
         </Routes>
       </div>
     </Router>
