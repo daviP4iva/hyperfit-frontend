@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/App.css';
+import GoogleLoginButton from '../components/LoginComponent/googleloginbutton';
 
 const Login = () => {
   return (
@@ -28,10 +29,9 @@ const Login = () => {
           </div>
         </div>
         
-        <button className="btn btn-outline" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/google.svg" alt="Google" style={{ width: '20px', height: '20px', marginRight: '10px' }} />
-          Continue with Google
-        </button>
+
+
+        <GoogleLoginButton />
         
         <button className="btn btn-outline" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <img src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/apple.svg" alt="Apple" style={{ width: '20px', height: '20px', marginRight: '10px' }} />
