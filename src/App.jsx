@@ -11,9 +11,7 @@ import EditProfile from './pages/EditProfile';
 import Training from './pages/Training';
 import './styles/App.css';
 import GeneratedRoutine from './pages/GeneratedRoutine';
-import Chatbot from './pages/Chatbot';
-import Exercise from './pages/Exercise';
-import ExerciseInProgress from './pages/ExerciseInProgress';
+
 
 function App() {
   return (
@@ -30,9 +28,6 @@ function App() {
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/training" element={<Training />} />
           <Route path="/generated-routine" element={<GeneratedRoutine />} />
-           <Route path="/chatbot" element={<Chatbot />} />
-           <Route path="/exercise" element={<Exercise />} />
-           <Route path="/exercise-in-progress" element={<ExerciseInProgress />} />
         </Routes>
       </div>
     </Router>
