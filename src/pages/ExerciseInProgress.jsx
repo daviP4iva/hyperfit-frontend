@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // Importa imágenes con Vite
@@ -21,25 +21,50 @@ function getImageForExercise(nombre) {
   return images[fileName] || images['default.gif'];
 }
 
+function getEstimation(ejercicio) {
+  const nombre = ejercicio?.nombre?.toLowerCase() || '';
+  let tiempo = 2; // minutos
+  let calorias = 2;
+  let series = ejercicio?.series || 4;
+
+  if (nombre.includes('sentadilla') || nombre.includes('peso muerto') || nombre.includes('prensa')) {
+    tiempo = 4;
+    calorias = 4;
+  } else if (nombre.includes('plancha') || nombre.includes('planchas')) {
+    tiempo = 1;
+    calorias = 1;
+  } else if (nombre.includes('dominada') || nombre.includes('fondos')) {
+    tiempo = 3;
+    calorias = 3;
+  } else if (nombre.includes('crunch') || nombre.includes('rueda abdominal')) {
+    tiempo = 1;
+    calorias = 1;
+  }
+  return { tiempo, calorias, series };
+}
+
 const ExerciseProgress = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const ejercicio = location.state?.ejercicio;
 
+  const { tiempo, calorias, series } = getEstimation(ejercicio);
+  const [seconds, setSeconds] = useState(tiempo * 60);
+
+  useEffect(() => {
+    if (seconds <= 0) return;
+    const timer = setTimeout(() => setSeconds(seconds - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [seconds]);
+
   const handleFinish = () => {
-    navigate(-1); // Vuelve a la pantalla anterior o cambia la ruta según tu flujo
+    navigate(-1);
   };
 
   const imgSrc = getImageForExercise(ejercicio?.nombre);
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#fff',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center'
-    }}>
+    <div style={{ minHeight: '100vh', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {/* Header */}
       <div style={{
         width: '100%',
@@ -84,8 +109,8 @@ const ExerciseProgress = () => {
         boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
         margin: '32px 0 0 0',
         padding: 24,
-        maxWidth: 340,
-        width: '90%',
+        maxWidth: 400,
+        width: '95%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center'
@@ -95,8 +120,8 @@ const ExerciseProgress = () => {
           src={imgSrc}
           alt={ejercicio?.nombre || 'Ejercicio'}
           style={{
-            width: 340,
-            height: 240,
+            width: 400,
+            height: 280,
             objectFit: 'contain',
             borderRadius: 14,
             marginBottom: 18,
@@ -121,6 +146,32 @@ const ExerciseProgress = () => {
         >
           <span role="img" aria-label="bot" style={{ fontSize: 20 }}>🤖</span> HyperBot
         </button>
+        {/* Iconos y datos */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 32,
+          margin: '18px 0 18px 0'
+        }}>
+          {/* Tiempo (temporizador) */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <svg width="36" height="36" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#222" strokeWidth="2"/><path d="M12 7v5l3 3" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <span style={{ fontSize: 14, color: '#222', marginTop: 2 }}>
+              {`${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`}
+            </span>
+          </div>
+          {/* Calorías */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <svg width="36" height="36" fill="none" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8L21 10h-9l1-8z" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <span style={{ fontSize: 14, color: '#222', marginTop: 2 }}>{calorias} kcal</span>
+          </div>
+          {/* Series */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <svg width="36" height="36" fill="none" viewBox="0 0 24 24"><path d="M6 20V10M12 20V4M18 20V14" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <span style={{ fontSize: 14, color: '#222', marginTop: 2 }}>{series} series</span>
+          </div>
+        </div>
         <div style={{ marginBottom: 24, textAlign: 'center', fontWeight: 500 }}>
           {ejercicio?.nombre ? `¡Sigue así con ${ejercicio.nombre}!` : 'Sigue así, ¡tú puedes!'}
         </div>
