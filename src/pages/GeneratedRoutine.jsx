@@ -1,42 +1,117 @@
-import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import '../styles/App.css';
 
-const fakeRoutine = [
-  {
-    dia: 1,
-    ejercicios: [
-      { nombre: 'Sentadillas', series: 3, repeticiones: 15 },
-      { nombre: 'Flexiones', series: 3, repeticiones: 12 },
-      { nombre: 'Plancha', series: 3, repeticiones: '30 seg' },
-    ],
-  },
-  {
-    dia: 2,
-    ejercicios: [
-      { nombre: 'Zancadas', series: 3, repeticiones: 10 },
-      { nombre: 'Mountain Climbers', series: 3, repeticiones: 20 },
-    ],
-  },
-  {
-    dia: 3,
-    ejercicios: [
-      { nombre: 'Burpees', series: 3, repeticiones: 12 },
-      { nombre: 'Abdominales', series: 4, repeticiones: 20 },
-    ],
-  },
-];
+const LISTA_EJERCICIOS = `
+EJERCICIOS DE GIMNASIO - LISTA COMPLETA (20 EJERCICIOS)
+
+--- EMPUJE (Pecho, Hombros, Tríceps) ---
+1. Press de banca plano con barra 
+2. Press militar con barra o mancuernas
+3. Fondos en paralelas
+4. Elevaciones laterales con mancuernas
+5. Press de banca inclinado con mancuernas
+
+--- TRACCIÓN (Espalda, Bíceps) ---
+6. Dominadas (pull-ups o chin-ups)
+7. Remo con barra o mancuerna 
+8. Peso muerto convencional
+9. Jalones al pecho en polea
+10. Curl de bíceps con barra o mancuernas
+
+--- PIERNAS (Cuádriceps, Isquios, Glúteos, Gemelos) ---
+11. Sentadillas con barra
+12. Prensa de piernas
+13. Zancadas con mancuernas o barra
+14. Peso muerto rumano
+
+--- CORE (Abdominales y zona media) ---
+16. Planchas 
+17. Elevaciones de piernas colgado en barra o en banco
+18. Crunch en máquina o en el suelo
+19. Rueda abdominal
+
+`;
 
 const GeneratedRoutine = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { goal, level, daysPerWeek } = location.state || {};
+
+  const [routine, setRoutine] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Recupera los parámetros y rutina guardados
+    const savedRoutine = sessionStorage.getItem('hyperfit_routine');
+    const savedParams = sessionStorage.getItem('hyperfit_routine_params');
+    const currentParams = JSON.stringify({ goal, level, daysPerWeek });
+
+    // Si los parámetros coinciden, usa la rutina guardada
+    if (savedRoutine && savedParams === currentParams) {
+      setRoutine(JSON.parse(savedRoutine));
+      setLoading(false);
+      return;
+    }
+
+    // Si no, genera una nueva rutina y guarda los nuevos parámetros
+    const prompt = `
+Utiliza únicamente los siguientes ejercicios para crear la rutina (no inventes otros):
+
+${LISTA_EJERCICIOS}
+
+Genera una rutina de ejercicios en formato JSON, no pongas marcaciones especiales, voy a importarlo tal cual me lo mandes, para ${daysPerWeek || 3} días, objetivo: ${goal || 'general'}, nivel: ${level || 'principiante'}. Para cada día, incluye nombre, series y repeticiones por ejercicio. Solo responde con el JSON, sin explicaciones.
+`;
+
+    fetch('http://localhost:8000/api/v1/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_message: prompt,
+      })
+    })
+      .then(res => res.json())
+      .then(data => {
+        try {
+          let jsonString = data.response.trim();
+          if (jsonString.startsWith('```json')) {
+            jsonString = jsonString.replace(/^```json/, '').replace(/```$/, '').trim();
+          } else if (jsonString.startsWith('```')) {
+            jsonString = jsonString.replace(/^```/, '').replace(/```$/, '').trim();
+          }
+          const rutinaJson = JSON.parse(jsonString);
+          let rutinaArray = [];
+          if (rutinaJson.rutina && typeof rutinaJson.rutina === 'object' && !Array.isArray(rutinaJson.rutina)) {
+            rutinaArray = Object.keys(rutinaJson.rutina)
+              .sort((a, b) => {
+                const numA = parseInt(a.replace(/\D/g, ''), 10);
+                const numB = parseInt(b.replace(/\D/g, ''), 10);
+                return numA - numB;
+              })
+              .map(key => rutinaJson.rutina[key]);
+          } else if (Array.isArray(rutinaJson.rutina)) {
+            rutinaArray = rutinaJson.rutina;
+          }
+          setRoutine(rutinaArray);
+          sessionStorage.setItem('hyperfit_routine', JSON.stringify(rutinaArray));
+          sessionStorage.setItem('hyperfit_routine_params', currentParams);
+        } catch (e) {
+          setRoutine([]);
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [goal, level, daysPerWeek]);
 
   const handleBack = () => {
     navigate(-1);
   };
 
-  const handleStartDay = (dia) => {
-    alert(`¡Empezando Día ${dia + 1}! (Aquí iría la pantalla de entrenamiento)`);
-    // Más adelante: navigate(`/training-day/${dia + 1}`);
+  const handleStartDay = (diaIndex) => {
+    const ejercicios = routine[diaIndex]?.ejercicios || [];
+    if (ejercicios.length > 0) {
+      navigate('/exercise', { state: { ejercicios } });
+    }
   };
 
   return (
@@ -77,31 +152,44 @@ const GeneratedRoutine = () => {
 
         {/* Main Content */}
         <main style={{ flex: 1, marginTop: '60px', marginBottom: '90px', padding: '20px' }}>
-          {fakeRoutine.map((dia, index) => (
-            <div key={index} style={{
-              backgroundColor: '#f9f9f9',
-              borderRadius: '12px',
-              padding: '16px',
-              marginBottom: '20px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-            }}>
-              <h3 style={{ marginBottom: '12px' }}>Día {index + 1}</h3>
-              <ul style={{ paddingLeft: '20px', marginBottom: '16px' }}>
-                {dia.ejercicios.map((ej, i) => (
-                  <li key={i} style={{ marginBottom: '6px' }}>
-                    {ej.nombre}: {ej.series} x {ej.repeticiones}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => handleStartDay(index)}
-                className="btn btn-primary"
-                style={{ width: '100%', backgroundColor: '#8A2BE2', color: 'white', padding: '10px', borderRadius: '8px' }}
-              >
-                Empezar Día {index + 1}
-              </button>
-            </div>
-          ))}
+          {loading ? (
+            <p>Cargando rutina...</p>
+          ) : (
+            routine.length === 0 ? (
+              <p>No se pudo generar la rutina. Intenta de nuevo.</p>
+            ) : (
+              routine.map((dia, index) => (
+                <div key={index} style={{
+                  backgroundColor: '#f9f9f9',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  marginBottom: '20px',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+                }}>
+                  <h3 style={{ marginBottom: '12px' }}>{dia.nombre ? dia.nombre : `Día ${index + 1}`}</h3>
+                  <ul style={{ paddingLeft: '20px', marginBottom: '16px' }}>
+                    {(dia.ejercicios || []).length === 0 ? (
+                      <li style={{ color: '#888' }}>Cargando ejercicios...</li>
+                    ) : (
+                      dia.ejercicios.map((ej, i) => (
+                        <li key={i} style={{ marginBottom: '6px' }}>
+                          {ej.nombre}: {ej.series} x {ej.repeticiones}
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                  <button
+                    onClick={() => handleStartDay(index)}
+                    className="btn btn-primary"
+                    style={{ width: '100%', backgroundColor: '#8A2BE2', color: 'white', padding: '10px', borderRadius: '8px' }}
+                    disabled={loading || (dia.ejercicios || []).length === 0}
+                  >
+                    {loading || (dia.ejercicios || []).length === 0 ? 'Cargando...' : `Empezar Día ${index + 1}`}
+                  </button>
+                </div>
+              ))
+            )
+          )}
         </main>
 
         {/* Bottom Nav */}
