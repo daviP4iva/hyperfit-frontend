@@ -13,13 +13,9 @@ const Training = () => {
   };
 
   const handleGenerateRoutine = () => {
-    navigate('/generated-routine', {
-      state: {
-        goal,
-        level,
-        daysPerWeek
-      }
-    });
+    // In a real app, you would call an AI service to generate a routine
+    // For now, we'll just navigate back to the dashboard
+    navigate('/generated-routine');
   };
 
   return (
