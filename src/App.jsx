@@ -11,6 +11,8 @@ import EditProfile from './pages/EditProfile';
 import Training from './pages/Training';
 import './styles/App.css';
 import GeneratedRoutine from './pages/GeneratedRoutine';
+import ExerciseView from './pages/ExerciseView';
+import WorkoutCompleted from './pages/WorkoutCompleted';
 
 
 function App() {
@@ -28,6 +30,8 @@ function App() {
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/training" element={<Training />} />
           <Route path="/generated-routine" element={<GeneratedRoutine />} />
+          <Route path="/exercise-view" element={<ExerciseView />} />
+          <Route path="/workout-completed" element={<WorkoutCompleted />} />
         </Routes>
       </div>
     </Router>

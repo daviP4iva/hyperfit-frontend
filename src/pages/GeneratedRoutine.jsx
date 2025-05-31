@@ -1,123 +1,150 @@
-import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import '../styles/App.css';
-
-const fakeRoutine = [
-  {
-    dia: 1,
-    ejercicios: [
-      { nombre: 'Sentadillas', series: 3, repeticiones: 15 },
-      { nombre: 'Flexiones', series: 3, repeticiones: 12 },
-      { nombre: 'Plancha', series: 3, repeticiones: '30 seg' },
-    ],
-  },
-  {
-    dia: 2,
-    ejercicios: [
-      { nombre: 'Zancadas', series: 3, repeticiones: 10 },
-      { nombre: 'Mountain Climbers', series: 3, repeticiones: 20 },
-    ],
-  },
-  {
-    dia: 3,
-    ejercicios: [
-      { nombre: 'Burpees', series: 3, repeticiones: 12 },
-      { nombre: 'Abdominales', series: 4, repeticiones: 20 },
-    ],
-  },
-];
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 
 const GeneratedRoutine = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const { goal, level, days, completedDay } = location.state || {};
+  const [routine, setRoutine] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [completedDays, setCompletedDays] = useState([]);
 
-  const handleBack = () => {
-    navigate(-1);
-  };
+  const handleBack = () => navigate(-1);
 
-  const handleStartDay = (dia) => {
-    alert(`¡Empezando Día ${dia + 1}! (Aquí iría la pantalla de entrenamiento)`);
-    // Más adelante: navigate(`/training-day/${dia + 1}`);
-  };
+  useEffect(() => {
+    // Actualizar los días completados si se recibe un nuevo día completado
+    if (completedDay && !completedDays.includes(completedDay)) {
+      setCompletedDays(prev => [...prev, completedDay]);
+    }
+  }, [completedDay, completedDays]);
+
+  useEffect(() => {
+    if (!goal || !level || !days) return;
+
+    const fetchRoutine = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/generate-routine", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ goal, level, days_per_week: days })
+        });
+        const data = await response.json();
+        setRoutine(data);
+      } catch (error) {
+        console.log("Usando rutina simulada");
+        setRoutine([
+          {
+            day: 1,
+            exercises: [
+              { name: "Sentadillas", video_url: "", instructions: "3 series de 15 repeticiones" },
+              { name: "Flexiones", video_url: "", instructions: "3 series de 10 repeticiones" }
+            ]
+          },
+          {
+            day: 2,
+            exercises: [
+              { name: "Plancha", video_url: "", instructions: "3 series de 30 segundos" },
+              { name: "Zancadas", video_url: "", instructions: "3 series de 12 repeticiones" }
+            ]
+          }
+        ]);
+        console.error("Error al generar rutina:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoutine();
+  }, [goal, level, days]);
 
   return (
-    <div style={{ width: '100%', minHeight: '100vh', backgroundColor: 'white', position: 'relative' }}>
-      <div style={{ maxWidth: '450px', margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-
+    <div style={{ width: '100%', minHeight: '100vh', backgroundColor: 'white' }}>
+      <div style={{ maxWidth: '450px', margin: '0 auto', paddingTop: '60px', paddingBottom: '90px' }}>
         {/* Header */}
         <header style={{
-          width: '100%',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          background: 'white',
-          borderBottom: '1px solid #f0f0f0',
-          zIndex: 999
+          width: '100%', position: 'fixed', top: 0, left: 0, right: 0,
+          background: 'white', borderBottom: '1px solid #f0f0f0', zIndex: 999
         }}>
           <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 16px',
-            height: '60px',
-            maxWidth: '450px',
-            margin: '0 auto'
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '0 16px', height: '60px', maxWidth: '450px', margin: '0 auto'
           }}>
-            <button onClick={handleBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '5px' }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 12H5M5 12L12 19M5 12L12 5"
-                  stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+            <button onClick={handleBack} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+              <svg width="24" height="24"><path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#333" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </button>
-            <h2 style={{ flex: 1, textAlign: 'center', margin: 0, color: '#8A2BE2' }}>Rutina Generada</h2>
+            <h2 style={{ flex: 1, textAlign: 'center', color: '#8A2BE2' }}>Rutina Generada</h2>
             <div style={{ width: '24px' }}></div>
           </div>
         </header>
 
         {/* Main Content */}
-        <main style={{ flex: 1, marginTop: '60px', marginBottom: '90px', padding: '20px' }}>
-          {fakeRoutine.map((dia, index) => (
-            <div key={index} style={{
-              backgroundColor: '#f9f9f9',
-              borderRadius: '12px',
-              padding: '16px',
-              marginBottom: '20px',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-            }}>
-              <h3 style={{ marginBottom: '12px' }}>Día {index + 1}</h3>
-              <ul style={{ paddingLeft: '20px', marginBottom: '16px' }}>
-                {dia.ejercicios.map((ej, i) => (
-                  <li key={i} style={{ marginBottom: '6px' }}>
-                    {ej.nombre}: {ej.series} x {ej.repeticiones}
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => handleStartDay(index)}
-                className="btn btn-primary"
-                style={{ width: '100%', backgroundColor: '#8A2BE2', color: 'white', padding: '10px', borderRadius: '8px' }}
-              >
-                Empezar Día {index + 1}
-              </button>
-            </div>
-          ))}
+        <main style={{ padding: '20px' }}>
+          {loading ? (
+            <p style={{ textAlign: 'center' }}>Generando rutina con IA...</p>
+          ) : (
+            routine.map((dia, index) => {
+              const isDayCompleted = completedDays.includes(dia.day);
+              
+              return (
+                <div key={index} style={{
+                  backgroundColor: isDayCompleted ? '#E8F5E9' : '#f9f9f9', 
+                  borderRadius: '12px', 
+                  padding: '16px',
+                  marginBottom: '20px', 
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
+                  borderLeft: isDayCompleted ? '4px solid #4CAF50' : 'none'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                    <h3 style={{ margin: 0 }}>Día {dia.day}</h3>
+                    {isDayCompleted && (
+                      <div style={{ 
+                        marginLeft: '10px', 
+                        backgroundColor: '#4CAF50', 
+                        color: 'white',
+                        padding: '2px 8px',
+                        borderRadius: '10px',
+                        fontSize: '12px'
+                      }}>
+                        Completado
+                      </div>
+                    )}
+                  </div>
+                  
+                  <ul>
+                    {dia.exercises.map((ej, i) => (
+                      <li key={i}>
+                        <strong>{ej.name}</strong>: {ej.instructions}
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  <button 
+                    onClick={() => navigate('/exercise-view', { state: { day: dia.day, exercises: dia.exercises } })}
+                    style={{ 
+                      marginTop: '10px', 
+                      backgroundColor: isDayCompleted ? '#4CAF50' : '#8A2BE2', 
+                      color: 'white', 
+                      border: 'none', 
+                      padding: '10px', 
+                      borderRadius: '8px', 
+                      width: '100%', 
+                      cursor: 'pointer' 
+                    }}
+                  >
+                    {isDayCompleted ? 'Repetir Día' : `Empezar Día ${index + 1}`}
+                  </button>
+                </div>
+              );
+            })
+          )}
         </main>
 
         {/* Bottom Nav */}
         <nav style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          maxWidth: '450px',
-          margin: '0 auto',
-          background: 'white',
-          borderTop: '1px solid #f0f0f0',
-          display: 'flex',
-          justifyContent: 'space-around',
-          padding: '10px 0',
-          zIndex: 1000
+          position: 'fixed', bottom: 0, left: 0, right: 0,
+          maxWidth: '450px', margin: '0 auto', background: 'white',
+          borderTop: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-around',
+          padding: '10px 0', zIndex: 1000
         }}>
           <Link to="/dashboard" className="nav-item active" style={{ textAlign: 'center' }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"

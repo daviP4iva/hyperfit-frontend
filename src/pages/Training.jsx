@@ -15,7 +15,17 @@ const Training = () => {
   const handleGenerateRoutine = () => {
     // In a real app, you would call an AI service to generate a routine
     // For now, we'll just navigate back to the dashboard
-    navigate('/generated-routine');
+    if (!goal || !level || !daysPerWeek) {
+      alert("Por favor, completa todos los campos.");
+      return;
+    }
+    navigate('/generated-routine', {
+      state: {
+        goal,
+        level,
+        days: parseInt(daysPerWeek)
+      }
+    });
   };
 
   return (
