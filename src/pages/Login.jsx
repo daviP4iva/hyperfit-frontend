@@ -28,15 +28,24 @@ const Login = () => {
           </div>
         </div>
         
+        <form style={{ width: '100%', marginBottom: '16px' }}>
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">Correo electrónico</label>
+            <input type="email" id="email" name="email" className="form-control" placeholder="Introduce tu correo" required />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">Contraseña</label>
+            <input type="password" id="password" name="password" className="form-control" placeholder="Introduce tu contraseña" required />
+          </div>
+          <button type="submit" className="btn btn-primary">Iniciar sesión</button>
+        </form>
+        
         <button className="btn btn-outline" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <img src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/google.svg" alt="Google" style={{ width: '20px', height: '20px', marginRight: '10px' }} />
           Continue with Google
         </button>
         
-        <button className="btn btn-outline" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/apple.svg" alt="Apple" style={{ width: '20px', height: '20px', marginRight: '10px' }} />
-          Continue with Apple
-        </button>
+
         
         <div style={{ marginTop: '20px', fontSize: '14px' }}>
           ¿No tienes una cuenta? <Link to="/register" style={{ color: '#8A2BE2', textDecoration: 'none' }}>Registrarse</Link>
