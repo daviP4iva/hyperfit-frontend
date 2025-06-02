@@ -213,7 +213,7 @@ const EditProfile = () => {
           <span>Inicio</span>
         </Link>
 
-        <Link to="/search" className="nav-item" style={{ textAlign: 'center' }}>
+        <Link to="/coming-soon" className="nav-item" style={{ textAlign: 'center' }}>
           <svg
             width="24"
             height="24"

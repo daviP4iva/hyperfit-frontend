@@ -11,6 +11,9 @@ import EditProfile from './pages/EditProfile';
 import Training from './pages/Training';
 import './styles/App.css';
 import GeneratedRoutine from './pages/GeneratedRoutine';
+import ComingSoon from './pages/ComingSoon';
+import Privacy from './pages/Privacy';
+import Support from './pages/Support';
 
 
 function App() {
@@ -18,6 +21,9 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/coming-soon" element={<ComingSoon />} />
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/personal-profile" element={<PersonalProfile />} />

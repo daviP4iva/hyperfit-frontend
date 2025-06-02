@@ -13,6 +13,15 @@ const Settings = () => {
     navigate('/user-profile');
   };
 
+  const handlePrivacyClick = () => {
+    navigate('/privacy');
+  };
+
+  const handleSupportClick = () => {
+    navigate('/support');
+  };
+
+
   return (
     <div style={{ width: '100%', minHeight: '100vh', backgroundColor: 'white', position: 'relative' }}>
       {/* HEADER FIJO - FUERA DEL CONTENEDOR CENTRADO */}
@@ -84,8 +93,8 @@ const Settings = () => {
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {[
             { label: 'Perfil', onClick: handleProfileClick },
-            { label: 'Privacidad' },
-            { label: 'Soporte' },
+            { label: 'Privacidad', onClick: handlePrivacyClick },
+            { label: 'Soporte', onClick: handleSupportClick },
           ].map(({ label, onClick }, index) => (
             <div
               key={index}
@@ -158,7 +167,7 @@ const Settings = () => {
           <span>Inicio</span>
         </Link>
 
-        <Link to="/search" className="nav-item" style={{ textAlign: 'center' }}>
+        <Link to="/coming-soon" className="nav-item" style={{ textAlign: 'center' }}>
           <svg
             width="24"
             height="24"
