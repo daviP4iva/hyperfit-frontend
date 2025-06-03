@@ -18,6 +18,7 @@ import Support from './pages/Support';
 import Chatbot from './pages/Chatbot';
 import Exercise from './pages/Exercise';
 import ExerciseInProgress from './pages/ExerciseInProgress';
+import WorkoutCompleted from './pages/WorkoutCompleted';
 
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
             <Route path="/exercise" element={<Exercise />} />
             <Route path="/chatbot" element={<Chatbot />} />
            <Route path="/exercise-in-progress" element={<ExerciseInProgress />} />
+            <Route path="/workout-completed" element={<WorkoutCompleted />} />
           </Routes>
         </div>
       </Router>
