@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/App.css';
 import authService from '../services/authService';
 import toastService from '../services/toastService';
+import logo from '../assets/HyperfitLOGO.png';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -60,14 +61,42 @@ const Login = () => {
           style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} 
           onClick={handleGoogleLogin}
         >
-          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/google.svg" alt="Google" style={{ width: '20px', height: '20px', marginRight: '10px' }} />
-          Continue with Google
+<img 
+              src={logo} 
+              alt="Logo HyperFit" 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            />          Continue with Google
         </button>
         
-        <button className="btn btn-outline" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <img src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/apple.svg" alt="Apple" style={{ width: '20px', height: '20px', marginRight: '10px' }} />
-          Continue with Apple
-        </button>
+        <form style={{ width: '100%', marginBottom: '16px' }} onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">Correo electrónico</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              className="form-control"
+              placeholder="Introduce tu correo"
+              required
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">Contraseña</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              className="form-control"
+              placeholder="Introduce tu contraseña"
+              required
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+          </div>
+          <button type="submit" className="btn btn-primary">Iniciar sesión</button>
+        </form>
         
         <div style={{ marginTop: '20px', fontSize: '14px' }}>
           ¿No tienes una cuenta? <Link to="/register" style={{ color: '#8A2BE2', textDecoration: 'none' }}>Registrarse</Link>
