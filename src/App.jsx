@@ -40,6 +40,7 @@ function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/support" element={<Support />} />
             <Route path="/exercise" element={<Exercise />} />
+            <Route path="/chatbot" element={<Chatbot />} />
            <Route path="/exercise-in-progress" element={<ExerciseInProgress />} />
           </Routes>
         </div>
