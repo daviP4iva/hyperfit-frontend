@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/App.css';
-import authService from '../services/authService';
 
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -13,11 +12,6 @@ const Dashboard = () => {
 
   const handleSettingsClick = () => {
     navigate('/settings');
-  };
-
-  const handleLogout = () => {
-    authService.logout();
-    navigate('/');
   };
 
   return (
@@ -57,7 +51,7 @@ const Dashboard = () => {
             }}>
               <div className="dropdown-item" onClick={handleSettingsClick} style={{ padding: '10px 20px' }}>Ajustes</div>
               <div className="dropdown-item" style={{ padding: '10px 20px' }}>Notificaciones</div>
-              <div className="dropdown-item" style={{ padding: '10px 20px' }} onClick={handleLogout}>Cerrar sesión</div>
+              <div className="dropdown-item" style={{ padding: '10px 20px' }}>Cerrar sesión</div>
             </div>
           )}
         </header>
@@ -111,18 +105,13 @@ const Dashboard = () => {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <button
                 className="btn btn-primary"
-                style={{ width: '100%', maxWidth: '280px', margin: '10px 0' }}
+                style={{ width: '100%', maxWidth: '280px', margin: '70px 0' }}
                 onClick={handleTrainingClick}
               >
                 Entrenamiento
               </button>
 
-              <button
-                className="btn btn-primary"
-                style={{ width: '100%', maxWidth: '280px', margin: '10px 0' }}
-              >
-                Nutrición
-              </button>
+             
             </div>
           </div>
         </main>
@@ -151,7 +140,7 @@ const Dashboard = () => {
             <span>Inicio</span>
           </Link>
 
-          <Link to="/search" className="nav-item" style={{ textAlign: 'center' }}>
+          <Link to="/coming-soon" className="nav-item" style={{ textAlign: 'center' }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
               xmlns="http://www.w3.org/2000/svg">
               <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
