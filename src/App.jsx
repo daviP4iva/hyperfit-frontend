@@ -15,6 +15,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import ComingSoon from './pages/Comingsoon';
 import Privacy from './pages/Privacy';
 import Support from './pages/Support';
+import Chatbot from './pages/Chatbot';
+import Exercise from './pages/Exercise';
+import ExerciseInProgress from './pages/ExerciseInProgress';
+
+
 function App() {
   return (
     <>
@@ -34,6 +39,8 @@ function App() {
             <Route path="/coming-soon" element={<ComingSoon />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/support" element={<Support />} />
+            <Route path="/exercise" element={<Exercise />} />
+           <Route path="/exercise-in-progress" element={<ExerciseInProgress />} />
           </Routes>
         </div>
       </Router>

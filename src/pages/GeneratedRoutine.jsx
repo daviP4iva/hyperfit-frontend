@@ -42,65 +42,57 @@ const GeneratedRoutine = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Recupera los parámetros y rutina guardados
+    const safeGoal = goal || 'general';
+    const safeLevel = level || 'principiante';
+    const safeDays = daysPerWeek || 3;
+
+    const currentParams = JSON.stringify({ goal: safeGoal, level: safeLevel, daysPerWeek: safeDays });
     const savedRoutine = sessionStorage.getItem('hyperfit_routine');
     const savedParams = sessionStorage.getItem('hyperfit_routine_params');
-    const currentParams = JSON.stringify({ goal, level, daysPerWeek });
 
-    // Si los parámetros coinciden, usa la rutina guardada
     if (savedRoutine && savedParams === currentParams) {
       setRoutine(JSON.parse(savedRoutine));
       setLoading(false);
       return;
     }
 
-    // Si no, genera una nueva rutina y guarda los nuevos parámetros
     const prompt = `
 Utiliza únicamente los siguientes ejercicios para crear la rutina (no inventes otros):
 
 ${LISTA_EJERCICIOS}
 
-Genera una rutina de ejercicios en formato JSON, no pongas marcaciones especiales, voy a importarlo tal cual me lo mandes, para ${daysPerWeek || 3} días, objetivo: ${goal || 'general'}, nivel: ${level || 'principiante'}. Para cada día, incluye nombre, series y repeticiones por ejercicio. Solo responde con el JSON, sin explicaciones.
+Genera una rutina de ejercicios en formato JSON, es muy importante que sea JSON, no pongas marcaciones especiales, voy a importarlo tal cual me lo mandes, para ${safeDays} días, objetivo: ${safeGoal}, nivel: ${safeLevel}.
+IMPORTANTE: Para cada día, el nombre debe ser exactamente "Día 1", "Día 2", "Día 3", etc. No uses nombres personalizados ni de grupos musculares.
+Para cada día, incluye nombre, series y repeticiones por ejercicio. Solo responde con el JSON, sin explicaciones.
 `;
 
+    // 1. Pide la respuesta al modelo
     fetch('http://localhost:8000/api/v1/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_message: prompt,
-      })
+      body: JSON.stringify({ user_message: prompt })
     })
       .then(res => res.json())
       .then(data => {
-        try {
-          let jsonString = data.response.trim();
-          if (jsonString.startsWith('```json')) {
-            jsonString = jsonString.replace(/^```json/, '').replace(/```$/, '').trim();
-          } else if (jsonString.startsWith('```')) {
-            jsonString = jsonString.replace(/^```/, '').replace(/```$/, '').trim();
-          }
-          const rutinaJson = JSON.parse(jsonString);
-          let rutinaArray = [];
-          if (rutinaJson.rutina && typeof rutinaJson.rutina === 'object' && !Array.isArray(rutinaJson.rutina)) {
-            rutinaArray = Object.keys(rutinaJson.rutina)
-              .sort((a, b) => {
-                const numA = parseInt(a.replace(/\D/g, ''), 10);
-                const numB = parseInt(b.replace(/\D/g, ''), 10);
-                return numA - numB;
-              })
-              .map(key => rutinaJson.rutina[key]);
-          } else if (Array.isArray(rutinaJson.rutina)) {
-            rutinaArray = rutinaJson.rutina;
-          }
-          setRoutine(rutinaArray);
-          sessionStorage.setItem('hyperfit_routine', JSON.stringify(rutinaArray));
-          sessionStorage.setItem('hyperfit_routine_params', currentParams);
-        } catch (e) {
-          setRoutine([]);
-        }
+        // 2. Envía la respuesta cruda al backend para procesar el JSON
+        return fetch('http://localhost:8000/api/v1/process-routine', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ response: data.response })
+        });
+      })
+      .then(res => res.json())
+      .then(data => {
+        const rutinaArray = data.routine || [];
+        setRoutine(rutinaArray);
+        sessionStorage.setItem('hyperfit_routine', JSON.stringify(rutinaArray));
+        sessionStorage.setItem('hyperfit_routine_params', currentParams);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setRoutine([]);
+        setLoading(false);
+      });
   }, [goal, level, daysPerWeek]);
 
   const handleBack = () => {
@@ -153,42 +145,43 @@ Genera una rutina de ejercicios en formato JSON, no pongas marcaciones especiale
         {/* Main Content */}
         <main style={{ flex: 1, marginTop: '60px', marginBottom: '90px', padding: '20px' }}>
           {loading ? (
-            <p>Cargando rutina...</p>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 60 }}>
+              <div className="spinner"></div>
+              <p style={{ color: '#8A2BE2', marginTop: 16, fontWeight: 500 }}>Generando tu rutina personalizada...</p>
+            </div>
+          ) : routine.length === 0 ? (
+            <p>No se pudo generar la rutina. Intenta de nuevo.</p>
           ) : (
-            routine.length === 0 ? (
-              <p>No se pudo generar la rutina. Intenta de nuevo.</p>
-            ) : (
-              routine.map((dia, index) => (
-                <div key={index} style={{
-                  backgroundColor: '#f9f9f9',
-                  borderRadius: '12px',
-                  padding: '16px',
-                  marginBottom: '20px',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-                }}>
-                  <h3 style={{ marginBottom: '12px' }}>{dia.nombre ? dia.nombre : `Día ${index + 1}`}</h3>
-                  <ul style={{ paddingLeft: '20px', marginBottom: '16px' }}>
-                    {(dia.ejercicios || []).length === 0 ? (
-                      <li style={{ color: '#888' }}>Cargando ejercicios...</li>
-                    ) : (
-                      dia.ejercicios.map((ej, i) => (
-                        <li key={i} style={{ marginBottom: '6px' }}>
-                          {ej.nombre}: {ej.series} x {ej.repeticiones}
-                        </li>
-                      ))
-                    )}
-                  </ul>
-                  <button
-                    onClick={() => handleStartDay(index)}
-                    className="btn btn-primary"
-                    style={{ width: '100%', backgroundColor: '#8A2BE2', color: 'white', padding: '10px', borderRadius: '8px' }}
-                    disabled={loading || (dia.ejercicios || []).length === 0}
-                  >
-                    {loading || (dia.ejercicios || []).length === 0 ? 'Cargando...' : `Empezar Día ${index + 1}`}
-                  </button>
-                </div>
-              ))
-            )
+            routine.map((dia, index) => (
+              <div key={index} style={{
+                backgroundColor: '#f9f9f9',
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '20px',
+                boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+              }}>
+                <h3 style={{ marginBottom: '12px' }}>{`Día ${index + 1}`}</h3>
+                <ul style={{ paddingLeft: '20px', marginBottom: '16px' }}>
+                  {(dia.ejercicios && dia.ejercicios.length > 0) ? (
+                    dia.ejercicios.map((ej, i) => (
+                      <li key={i} style={{ marginBottom: '6px' }}>
+                        {ej.nombre}: {ej.series} x {ej.repeticiones}
+                      </li>
+                    ))
+                  ) : (
+                    <li style={{ color: '#888' }}>No hay ejercicios para este día.</li>
+                  )}
+                </ul>
+                <button
+                  onClick={() => handleStartDay(index)}
+                  className="btn btn-primary"
+                  style={{ width: '100%', backgroundColor: '#8A2BE2', color: 'white', padding: '10px', borderRadius: '8px' }}
+                  disabled={(dia.ejercicios || []).length === 0}
+                >
+                  {(dia.ejercicios || []).length === 0 ? 'Sin ejercicios' : `Empezar Día ${index + 1}`}
+                </button>
+              </div>
+            ))
           )}
         </main>
 
@@ -216,7 +209,7 @@ Genera una rutina de ejercicios en formato JSON, no pongas marcaciones especiale
             <span>Inicio</span>
           </Link>
 
-          <Link to="/coming-soon" className="nav-item" style={{ textAlign: 'center' }}>
+          <Link to="/search" className="nav-item" style={{ textAlign: 'center' }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
               xmlns="http://www.w3.org/2000/svg">
               <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
@@ -243,4 +236,4 @@ Genera una rutina de ejercicios en formato JSON, no pongas marcaciones especiale
   );
 };
 
-export default GeneratedRoutine;    
+export default GeneratedRoutine;
