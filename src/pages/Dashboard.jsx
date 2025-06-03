@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/App.css';
+import authService from '../services/authService';
 
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -12,6 +13,11 @@ const Dashboard = () => {
 
   const handleSettingsClick = () => {
     navigate('/settings');
+  };
+  
+  const handleLogout = () => {
+    authService.logout();
+    navigate('/');
   };
 
   return (
@@ -51,7 +57,7 @@ const Dashboard = () => {
             }}>
               <div className="dropdown-item" onClick={handleSettingsClick} style={{ padding: '10px 20px' }}>Ajustes</div>
               <div className="dropdown-item" style={{ padding: '10px 20px' }}>Notificaciones</div>
-              <div className="dropdown-item" style={{ padding: '10px 20px' }}>Cerrar sesión</div>
+              <div className="dropdown-item" onClick={handleLogout} style={{ padding: '10px 20px' }}>Cerrar sesión</div>
             </div>
           )}
         </header>

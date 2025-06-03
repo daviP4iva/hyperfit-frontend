@@ -12,8 +12,9 @@ import './styles/App.css';
 import GeneratedRoutine from './pages/GeneratedRoutine';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-
+import ComingSoon from './pages/Comingsoon';
+import Privacy from './pages/Privacy';
+import Support from './pages/Support';
 function App() {
   return (
     <>
@@ -30,6 +31,9 @@ function App() {
             <Route path="/edit-profile" element={<EditProfile />} />
             <Route path="/training" element={<Training />} />
             <Route path="/generated-routine" element={<GeneratedRoutine />} />
+            <Route path="/coming-soon" element={<ComingSoon />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/support" element={<Support />} />
           </Routes>
         </div>
       </Router>

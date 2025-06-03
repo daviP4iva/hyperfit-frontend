@@ -195,7 +195,11 @@ const UserProfile = () => {
                 margin: '0 0 4px 0', 
                 color: '#333',
                 fontSize: '24px',
-                fontWeight: '600'
+                fontWeight: '600',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                maxWidth: '270px'
               }}>{user.name}</h2>
               <p style={{ margin: 0, color: '#666', fontSize: '14px' }}>{user.level}</p>
             </div>
@@ -331,7 +335,7 @@ const UserProfile = () => {
           <span>Inicio</span>
         </Link>
 
-        <Link to="/search" className="nav-item" style={{ textAlign: 'center' }}>
+        <Link to="/coming-soon" className="nav-item" style={{ textAlign: 'center' }}>
           <svg
             width="24"
             height="24"

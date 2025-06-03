@@ -39,7 +39,16 @@ api.interceptors.response.use(
 );
 
 // Basic user service methods
-const userService = {
+const authService = {
+  login: async (email, password) => {
+    try {
+      const response = await api.post('/api/v1/auth/login', { email, password });
+      localStorage.setItem('token', response.data);
+    } catch (error) {
+      throw error;
+    }
+  },
+
   register: async (userData) => {
     try {
       const response = await api({
@@ -66,9 +75,10 @@ const userService = {
   handleGoogleCallback: async (code) => {
     try {
       const response = await api.post('/api/v1/auth/google/callback', { code });
-      if (response.data.access_token) {
-        localStorage.setItem('token', response.data.access_token);
-        return response.data;
+      if (response.data) {
+        console.log(response.data);
+        localStorage.setItem('token', response.data.token);
+        return response.data.existed;
       }
     } catch (error) {
       throw error;
@@ -81,4 +91,4 @@ const userService = {
   },
 };
 
-export default userService;
+export default authService;
