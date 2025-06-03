@@ -1,8 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../styles/App.css';
+import userService from '../services/userService';
 
 const UserProfile = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        setLoading(true);
+        const userData = await userService.getUser();
+        setUser(userData);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
+
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -10,8 +29,64 @@ const UserProfile = () => {
   };
 
   const handleEditProfile = () => {
-    navigate('/edit-profile');
+    navigate('/edit-profile', { state: { reload: true } });
   };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        width: '100%', 
+        minHeight: '100vh', 
+        backgroundColor: 'white', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center' 
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ 
+            width: '40px', 
+            height: '40px', 
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #8A2BE2',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 16px'
+          }}></div>
+          <p style={{ color: '#666' }}>Cargando perfil...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div style={{ 
+        width: '100%', 
+        minHeight: '100vh', 
+        backgroundColor: 'white', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center' 
+      }}>
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <p style={{ color: '#666', marginBottom: '16px' }}>No se pudo cargar el perfil</p>
+          <button
+            onClick={handleBack}
+            style={{
+              backgroundColor: '#8A2BE2',
+              color: 'white',
+              border: 'none',
+              padding: '10px 20px',
+              borderRadius: '8px',
+              cursor: 'pointer'
+            }}
+          >
+            Volver
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ width: '100%', minHeight: '100vh', backgroundColor: 'white', position: 'relative' }}>
@@ -83,44 +158,140 @@ const UserProfile = () => {
           alignItems: 'center',
         }}
       >
-        {/* Foto de perfil */}
-        <div
-          style={{
-            width: '120px',
-            height: '120px',
-            borderRadius: '50%',
-            overflow: 'hidden',
-            margin: '30px 0 20px',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-          }}
-        >
-          <img
-            src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80"
-            alt="Profile"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
+        {/* Datos del usuario */}
+        <div style={{ 
+          width: '100%', 
+          backgroundColor: 'white',
+          borderRadius: '16px',
+          padding: '24px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          transition: 'transform 0.2s ease-in-out',
+          ':hover': {
+            transform: 'translateY(-2px)'
+          }
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '24px',
+            gap: '16px'
+          }}>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: '#8A2BE2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '24px',
+              fontWeight: 'bold'
+            }}>
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <h2 style={{ 
+                margin: '0 0 4px 0', 
+                color: '#333',
+                fontSize: '24px',
+                fontWeight: '600'
+              }}>{user.name}</h2>
+              <p style={{ margin: 0, color: '#666', fontSize: '14px' }}>{user.level}</p>
+            </div>
+          </div>
+          
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '1fr 1fr',
+            gap: '16px',
+            marginBottom: '24px'
+          }}>
+            <div style={{ 
+              backgroundColor: '#f8f9fa',
+              padding: '16px',
+              borderRadius: '12px',
+              textAlign: 'center'
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ marginBottom: '8px' }}>
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#8A2BE2" strokeWidth="2"/>
+                <path d="M12 6V12L16 14" stroke="#8A2BE2" strokeWidth="2"/>
+              </svg>
+              <p style={{ margin: '4px 0 0 0', color: '#333', fontWeight: '500' }}>{user.height} cm</p>
+              <p style={{ margin: '0', color: '#666', fontSize: '12px' }}>Altura</p>
+            </div>
+
+            <div style={{ 
+              backgroundColor: '#f8f9fa',
+              padding: '16px',
+              borderRadius: '12px',
+              textAlign: 'center'
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ marginBottom: '8px' }}>
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#8A2BE2" strokeWidth="2"/>
+                <path d="M12 6V12L16 14" stroke="#8A2BE2" strokeWidth="2"/>
+              </svg>
+              <p style={{ margin: '4px 0 0 0', color: '#333', fontWeight: '500' }}>{user.weight} kg</p>
+              <p style={{ margin: '0', color: '#666', fontSize: '12px' }}>Peso</p>
+            </div>
+          </div>
+
+          <div style={{ 
+            backgroundColor: '#f8f9fa',
+            padding: '16px',
+            borderRadius: '12px',
+            marginBottom: '16px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ marginRight: '10px' }}>
+                <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="#8A2BE2" strokeWidth="2"/>
+                <path d="M22 6L12 13L2 6" stroke="#8A2BE2" strokeWidth="2"/>
+              </svg>
+              <p style={{ margin: 0, color: '#666' }}>{user.email}</p>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ marginRight: '10px' }}>
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#8A2BE2" strokeWidth="2"/>
+                <path d="M12 6V12L16 14" stroke="#8A2BE2" strokeWidth="2"/>
+              </svg>
+              <p style={{ margin: 0, color: '#666' }}>{user.goal}</p>
+            </div>
+
+            {user.allergies && (
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ marginRight: '10px' }}>
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#8A2BE2" strokeWidth="2"/>
+                  <path d="M12 6V12L16 14" stroke="#8A2BE2" strokeWidth="2"/>
+                </svg>
+                <p style={{ margin: 0, color: '#666' }}>{user.allergies}</p>
+              </div>
+            )}
+          </div>
+
+          <button
+            className="btn btn-primary"
+            style={{
+              width: '100%',
+              margin: '0',
+              backgroundColor: '#8A2BE2',
+              color: 'white',
+              border: 'none',
+              padding: '12px',
+              borderRadius: '12px',
+              fontSize: '16px',
+              fontWeight: '500',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease-in-out',
+              ':hover': {
+                backgroundColor: '#7B1FA2'
+              }
+            }}
+            onClick={handleEditProfile}
+          >
+            Editar perfil
+          </button>
         </div>
-
-        {/* Nombre */}
-        <h2 style={{ margin: '10px 0', color: '#333' }}>@alexhyperfit</h2>
-
-        {/* Botón editar */}
-        <button
-          className="btn btn-primary"
-          style={{
-            width: '200px',
-            margin: '20px 0',
-            backgroundColor: '#8A2BE2',
-            color: 'white',
-            border: 'none',
-            padding: '10px',
-            borderRadius: '8px',
-            fontSize: '16px',
-          }}
-          onClick={handleEditProfile}
-        >
-          Editar perfil
-        </button>
       </div>
 
       {/* NAVBAR FIJA ABAJO */}

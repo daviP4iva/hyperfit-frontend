@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/App.css';
+import userService from '../services/authService';
+import toastService from '../services/toastService';
 
 const Register = () => {
-  const [accountType, setAccountType] = useState('personal');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -11,13 +12,21 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // In a real app, you would handle registration with a backend
-    // For now, we'll just navigate to the appropriate profile page
-    if (accountType === 'personal') {
-      navigate('/personal-profile');
-    } else {
-      navigate('/professional-profile');
-    }
+    const userData = {
+      name: username,
+      email: email,
+      password: password,
+    };
+    userService.register(userData)
+      .then(() => {
+        toastService.showSuccess('Usuario creado correctamente');
+        navigate('/personal-profile');
+      })
+      .catch(error => {
+        if (error.response?.status === 400) {
+          toastService.showError('El usuario ya existe');
+        }
+      });
   };
 
   return (
@@ -25,21 +34,6 @@ const Register = () => {
       <div className="card">
         <h1>Registrarse</h1>
         <p style={{ marginTop: '-10px', marginBottom: '20px', color: '#666' }}>Crear una cuenta</p>
-        
-        <div className="tab-group">
-          <div 
-            className={`tab ${accountType === 'personal' ? 'active' : ''}`}
-            onClick={() => setAccountType('personal')}
-          >
-            Cuenta personal
-          </div>
-          <div 
-            className={`tab ${accountType === 'professional' ? 'active' : ''}`}
-            onClick={() => setAccountType('professional')}
-          >
-            Cuenta profesional
-          </div>
-        </div>
         
         <form onSubmit={handleSubmit} style={{ width: '100%' }}>
           <div className="form-group">

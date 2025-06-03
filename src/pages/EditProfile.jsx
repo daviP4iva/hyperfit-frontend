@@ -1,24 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../styles/App.css';
+import userService from '../services/userService';
 
 const EditProfile = () => {
+  const [user, setUser] = useState(null);
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
+  const [level, setLevel] = useState('');
+  const [goals, setGoals] = useState('');
+  const [allergies, setAllergies] = useState('');
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
-  const [name, setName] = useState('Alex');
-  const [email, setEmail] = useState('alex@gmail.com');
-  const [height, setHeight] = useState('175');
-  const [weight, setWeight] = useState('72');
-  const [level, setLevel] = useState('Intermedio');
-  const [goals, setGoals] = useState('Tonificar, 3 días por semana');
-  const [allergies, setAllergies] = useState('Ninguno');
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userData = await userService.getUser();
+        setUser(userData);
+        setHeight(userData.height || '');
+        setWeight(userData.weight || '');
+        setLevel(userData.level || '');
+        setGoals(userData.goal || '');
+        setAllergies(userData.allergies || '');
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   const handleBack = () => {
     navigate(-1);
   };
 
   const handleSave = () => {
+    userService.updateProfile({
+      height: height,
+      weight: weight,
+      level: level,
+      goal: goals,
+      allergies: allergies,
+    });
     navigate('/user-profile');
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div style={{ width: '100%', minHeight: '100vh', backgroundColor: 'white', position: 'relative' }}>
@@ -93,8 +126,8 @@ const EditProfile = () => {
             <input
               type="text"
               className="form-control"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={user.name}
+              disabled
             />
           </div>
 
@@ -103,8 +136,8 @@ const EditProfile = () => {
             <input
               type="email"
               className="form-control"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={user.email}
+              disabled
             />
           </div>
 
@@ -139,20 +172,24 @@ const EditProfile = () => {
               value={level}
               onChange={(e) => setLevel(e.target.value)}
             >
-              <option value="Principiante">Principiante</option>
-              <option value="Intermedio">Intermedio</option>
-              <option value="Avanzado">Avanzado</option>
+              <option value="beginner">Principiante</option>
+              <option value="intermediate">Intermedio</option>
+              <option value="advanced">Avanzado</option>
             </select>
           </div>
 
           <div className="form-group">
             <label className="form-label">Objetivos:</label>
-            <input
-              type="text"
+            <select
               className="form-control"
               value={goals}
               onChange={(e) => setGoals(e.target.value)}
-            />
+            >
+              <option value="lose_weight">Perder peso</option>
+              <option value="gain_muscle">Ganar músculo</option>
+              <option value="maintain">Mantener</option>
+              <option value="define">Definir</option>
+            </select>
           </div>
 
           <div className="form-group">

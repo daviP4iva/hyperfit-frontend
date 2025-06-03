@@ -1,8 +1,35 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import '../styles/App.css';
+import authService from '../services/authService';
+import toastService from '../services/toastService';
 
 const Login = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check if we have a code in the URL (Google OAuth callback)
+    const urlParams = new URLSearchParams(location.search);
+    const code = urlParams.get('code');
+    
+    if (code) {
+      // Handle the OAuth callback
+      authService.handleGoogleCallback(code)
+        .then(() => {
+          navigate('/dashboard'); // Redirect to dashboard after successful login
+        })
+        .catch((error) => {
+          console.error('Google login error:', error);
+          // Handle error appropriately
+        });
+    }
+  }, [location, navigate]);
+
+  const handleGoogleLogin = () => {
+    authService.googleLogin()
+  };
+
   return (
     <div className="container">
       <div className="card">
@@ -28,7 +55,11 @@ const Login = () => {
           </div>
         </div>
         
-        <button className="btn btn-outline" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <button 
+          className="btn btn-outline" 
+          style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} 
+          onClick={handleGoogleLogin}
+        >
           <img src="https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/google.svg" alt="Google" style={{ width: '20px', height: '20px', marginRight: '10px' }} />
           Continue with Google
         </button>
