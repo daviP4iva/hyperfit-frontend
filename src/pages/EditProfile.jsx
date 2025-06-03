@@ -26,7 +26,7 @@ const EditProfile = () => {
         setGoals(userData.goal || '');
         setAllergies(userData.allergies || '');
       } catch (error) {
-        console.error('Error fetching user:', error);
+        toastService.showError('Error al obtener el perfil');
       } finally {
         setLoading(false);
       }

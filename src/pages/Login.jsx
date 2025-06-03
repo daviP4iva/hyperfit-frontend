@@ -28,7 +28,7 @@ const Login = () => {
           }
         })
         .catch((error) => {
-          console.error('Google login error:', error);
+          toastService.showError('Error al iniciar sesión');
           // Handle error appropriately
         });
     }

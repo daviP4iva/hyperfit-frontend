@@ -49,7 +49,6 @@ const userService = {
   },
   getUser: async () => {
     const response = await api.get('/api/v1/user/me');
-    console.log(response.data);
     return response.data;
   },
 };

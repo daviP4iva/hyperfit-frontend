@@ -76,7 +76,6 @@ const authService = {
     try {
       const response = await api.post('/api/v1/auth/google/callback', { code });
       if (response.data) {
-        console.log(response.data);
         localStorage.setItem('token', response.data.token);
         return response.data.existed;
       }

@@ -5,6 +5,7 @@ import userService from '../services/userService';
 import { CiRuler } from 'react-icons/ci';
 import { FaWeightScale } from 'react-icons/fa6';
 import { GoGoal } from 'react-icons/go';
+import toastService from '../services/toastService';
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -17,7 +18,7 @@ const UserProfile = () => {
         const userData = await userService.getUser();
         setUser(userData);
       } catch (error) {
-        console.error('Error fetching user:', error);
+        toastService.showError('Error al obtener el perfil');
       } finally {
         setLoading(false);
       }
