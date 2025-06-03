@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../styles/App.css';
 import userService from '../services/userService';
+import { CiRuler } from 'react-icons/ci';
+import { FaWeightScale } from 'react-icons/fa6';
+import { GoGoal } from 'react-icons/go';
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -217,10 +220,7 @@ const UserProfile = () => {
               borderRadius: '12px',
               textAlign: 'center'
             }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ marginBottom: '8px' }}>
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#8A2BE2" strokeWidth="2"/>
-                <path d="M12 6V12L16 14" stroke="#8A2BE2" strokeWidth="2"/>
-              </svg>
+              <CiRuler color="#8A2BE2" size={24} strokeWidth={1}/>
               <p style={{ margin: '4px 0 0 0', color: '#333', fontWeight: '500' }}>{user.height} cm</p>
               <p style={{ margin: '0', color: '#666', fontSize: '12px' }}>Altura</p>
             </div>
@@ -231,10 +231,7 @@ const UserProfile = () => {
               borderRadius: '12px',
               textAlign: 'center'
             }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ marginBottom: '8px' }}>
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#8A2BE2" strokeWidth="2"/>
-                <path d="M12 6V12L16 14" stroke="#8A2BE2" strokeWidth="2"/>
-              </svg>
+             <FaWeightScale color="#8A2BE2" size={24} strokeWidth={1}/>
               <p style={{ margin: '4px 0 0 0', color: '#333', fontWeight: '500' }}>{user.weight} kg</p>
               <p style={{ margin: '0', color: '#666', fontSize: '12px' }}>Peso</p>
             </div>
@@ -255,11 +252,8 @@ const UserProfile = () => {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ marginRight: '10px' }}>
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#8A2BE2" strokeWidth="2"/>
-                <path d="M12 6V12L16 14" stroke="#8A2BE2" strokeWidth="2"/>
-              </svg>
-              <p style={{ margin: 0, color: '#666' }}>{user.goal}</p>
+              <GoGoal color="#8A2BE2" size={20} strokeWidth={1}/>
+              <p style={{ margin: 0, color: '#666', marginLeft: '10px' }}>{user.goal}</p>
             </div>
 
             {user.allergies && (

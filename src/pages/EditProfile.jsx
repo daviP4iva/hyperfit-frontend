@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../styles/App.css';
 import userService from '../services/userService';
+import toastService from '../services/toastService';
 
 const EditProfile = () => {
   const [user, setUser] = useState(null);
@@ -45,8 +46,12 @@ const EditProfile = () => {
       level: level,
       goal: goals,
       allergies: allergies,
+    }).then(() => {
+      toastService.showSuccess('Perfil actualizado correctamente');
+      navigate('/user-profile', { state: { reload: true } });
+    }).catch((error) => {
+      toastService.showError('Error al actualizar el perfil');
     });
-    navigate('/user-profile');
   };
 
   if (loading) {

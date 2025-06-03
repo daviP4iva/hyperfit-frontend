@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../styles/App.css';
+import userService from '../services/userService';
+import toastService from '../services/toastService';
 
 const Training = () => {
   const navigate = useNavigate();
-  const [goal, setGoal] = useState('');
-  const [level, setLevel] = useState('');
   const [daysPerWeek, setDaysPerWeek] = useState('');
 
   const handleBack = () => {
@@ -13,12 +13,18 @@ const Training = () => {
   };
 
   const handleGenerateRoutine = () => {
-    navigate('/generated-routine', {
-      state: {
-        goal,
-        level,
-        daysPerWeek
-      }
+    userService.getUser().then((user) => {
+      const goal = user.goal;
+      const level = user.level;
+      navigate('/generated-routine', {
+        state: {
+          goal,
+          level,
+          daysPerWeek
+        }
+      });
+    }).catch((error) => {
+      toastService.showError('Error al obtener el perfil');
     });
   };
 
@@ -72,36 +78,6 @@ const Training = () => {
             <h1 style={{ textAlign: 'center', fontSize: '24px', marginBottom: '30px' }}>Generación de Rutina con IA</h1>
             
             <form style={{ textAlign: 'left' }}>
-              <div className="form-group">
-                <label className="form-label">Objetivo</label>
-                <select 
-                  className="form-control" 
-                  value={goal}
-                  onChange={(e) => setGoal(e.target.value)}
-                  required
-                >
-                  <option value="" disabled selected>Selecciona tu objetivo</option>
-                  <option value="perder_peso">Perder peso</option>
-                  <option value="ganar_musculo">Ganar músculo</option>
-                  <option value="tonificar">Tonificar</option>
-                  <option value="resistencia">Mejorar resistencia</option>
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label className="form-label">Nivel de experiencia</label>
-                <select 
-                  className="form-control" 
-                  value={level}
-                  onChange={(e) => setLevel(e.target.value)}
-                  required
-                >
-                  <option value="" disabled selected>Selecciona tu nivel</option>
-                  <option value="principiante">Principiante</option>
-                  <option value="intermedio">Intermedio</option>
-                  <option value="avanzado">Avanzado</option>
-                </select>
-              </div>
               
               <div className="form-group">
                 <label className="form-label">Días por semana</label>
